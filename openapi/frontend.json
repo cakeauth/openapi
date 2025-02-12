@@ -1,0 +1,26 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "CakeAuth Frontend API",
+    "description": "APIs for interacting with CakeAuth Frontend platform",
+    "version": "0.1.0",
+    "contact": {
+      "name": "CakeAuth team",
+      "email": "team@cakeauth.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "http://github.com/cakeauth/openapi/LICENSE"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://{host}.live.cakeauth.app",
+      "description": "Production environment"
+    },
+    {
+      "url": "https://{host}.dev.cakeauth.app",
+      "description": "Development environment"
+    }
+  ]
+}
