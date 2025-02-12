@@ -19,7 +19,7 @@
       "description": "Production environment"
     },
     {
-      "url": "https://{host}.dev.cakeauth.app",
+      "url": "https://{host}.test.cakeauth.app",
       "description": "Development environment"
     }
   ]
