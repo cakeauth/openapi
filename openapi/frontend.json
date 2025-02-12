@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "CakeAuth Frontend API",
-    "description": "APIs for interacting with CakeAuth Frontend platform",
+    "description": "APIs for interacting with CakeAuth for Frontend",
     "version": "0.1.0",
     "contact": {
       "name": "CakeAuth team",

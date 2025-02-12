@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "CakeAuth Backend API",
-    "description": "APIs for interacting with CakeAuth Backend platform",
+    "description": "APIs for interacting with CakeAuth for Backend",
     "version": "0.1.0",
     "contact": {
       "name": "CakeAuth team",
@@ -254,7 +254,8 @@
             "type": "string",
             "minLength": 8,
             "format": "password",
-            "description": "Assign password for this provider. If this value is not empty, the `is_password_enabled` will result to `true`. And vice versa."
+            "description": "Assign password for this provider. If this value is not empty, the `is_password_enabled` will result to `true`. And vice versa.",
+            "example": "my-secure-password"
           },
           "is_verified": {
             "type": "boolean",
