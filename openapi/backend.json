@@ -34,7 +34,31 @@
         "operationId": "getIdentifiers",
         "security": [{ "PrivateKeyAuth": [] }],
         "parameters": [
-          { "$ref": "#/components/schemas/PaginationQuery" },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page",
+            "example": 1,
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 1,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Pagination data size",
+            "example": 10,
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
           {
             "name": "user_id",
             "in": "query",
@@ -148,22 +172,6 @@
           },
           "code": { "type": "string", "example": "not_found" },
           "message": { "type": "string", "example": "Resources not found" }
-        }
-      },
-      "PaginationQuery": {
-        "type": "object",
-        "properties": {
-          "page": {
-            "type": "integer",
-            "minimum": 1,
-            "default": 1
-          },
-          "page_size": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 100,
-            "default": 10
-          }
         }
       },
       "ApiResponseWrapper": {
