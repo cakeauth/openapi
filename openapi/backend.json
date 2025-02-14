@@ -142,6 +142,63 @@
           "500": { "$ref": "#/components/responses/ErrorResponse" }
         }
       }
+    },
+    "/v1/identifiers/{identifier_id}/set_password": {
+      "post": {
+        "tags": ["Identifiers"],
+        "description": "Set a password to a specific identifier data. Only works with [direct identifier](/docs/guides/direct/overview).",
+        "summary": "Set password to identifier",
+        "operationId": "setIdentifierPassword",
+        "security": [{ "PrivateKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "identifier_id",
+            "in": "path",
+            "description": "ID of the target identifier",
+            "example": "idn_a9d35175ea94b9367aa18237ca518d99",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostSetIdentifierPasswordBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password set to an identifier",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/PostSetIdentifierPasswordResponse"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
     }
   },
   "components": {
@@ -521,6 +578,34 @@
             "description": "UNIX Timestamp of date created",
             "format": "unixtime",
             "example": 1739201710547
+          }
+        }
+      },
+      "PostSetIdentifierPasswordBody": {
+        "type": "object",
+        "required": ["new_password"],
+        "properties": {
+          "new_password": {
+            "type": "string",
+            "minLength": 8,
+            "format": "password",
+            "description": "New password that wants to be set",
+            "example": "my-secure-password"
+          },
+          "force_set": {
+            "type": "boolean",
+            "description": "This flags control whether password will be set to an identifier which previously has no password data (`is_password_enabled=false`). If this API was called to an identifier identifier with no previous password available and flag is **not** `true`, it will throws the [`invalid_payload`](/docs/references/errors#invalid_payload) error."
+          }
+        }
+      },
+      "PostSetIdentifierPasswordResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "SucResponse message",
+            "example": "Password successfully updated"
           }
         }
       }
