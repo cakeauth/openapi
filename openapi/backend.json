@@ -22,14 +22,63 @@
   "tags": [
     {
       "name": "Identifiers",
-      "description": "Manage user's identifiers"
+      "description": "An identifier is set of informations that being attached to a user that can be used as an authentication identity. Use these sets of endpoints to manage user's identifers. Read more about [direct identifier](/docs/guides/direct/overview) and [social identifiers](/docs/guides/oauth/overview)."
     }
   ],
   "paths": {
     "/v1/identifiers": {
+      "get": {
+        "tags": ["Identifiers"],
+        "summary": "List identifiers",
+        "description": "Retrieve a paginated list of identifiers filtered by user ID",
+        "operationId": "getIdentifiers",
+        "security": [{ "PrivateKeyAuth": [] }],
+        "parameters": [
+          { "$ref": "#/components/schemas/PaginationQuery" },
+          {
+            "name": "user_id",
+            "in": "query",
+            "description": "CakeAuth ID or user's defined external_id",
+            "example": "0194f092-a25a-700d-a4f6-8b50e865fd00",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of identifiers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/GetIdentifiersResponseItem"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      },
       "post": {
         "tags": ["Identifiers"],
-        "description": "Use this endpoint to create a new user identifer. Read more about user identifier [here](/todo)",
+        "description": "Use this endpoint to create a new user identifer",
         "summary": "Create New User Identifier",
         "operationId": "createIdentifier",
         "security": [{ "PrivateKeyAuth": [] }],
@@ -73,7 +122,7 @@
   },
   "components": {
     "schemas": {
-      "Status": { "type": "number", "example": 201 },
+      "Status": { "type": "number", "example": 200 },
       "Metadata": {
         "type": "object",
         "required": ["timestamp", "request_id"],
@@ -99,6 +148,22 @@
           },
           "code": { "type": "string", "example": "not_found" },
           "message": { "type": "string", "example": "Resources not found" }
+        }
+      },
+      "PaginationQuery": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1
+          },
+          "page_size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 10
+          }
         }
       },
       "ApiResponseWrapper": {
@@ -230,6 +295,89 @@
           "tiktok",
           "gitlab",
           "slack"
+        ]
+      },
+      "GetIdentifiersResponseItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Random unique ID",
+            "format": "nanoid",
+            "example": "idn_a9d35175ea94b9367aa18237ca518d99"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/ClientUsersIdentifierContactInformationsType"
+          },
+          "logo": {
+            "type": "string",
+            "format": "link",
+            "description": "Link to provider logo",
+            "example": "https://cdn.cakeauth.com/socials/apple.svg"
+          },
+          "value": {
+            "type": "string",
+            "description": "Value of given provider",
+            "example": "test@example.com"
+          },
+          "is_password_enabled": {
+            "type": "boolean",
+            "description": "Indicate whether this provider has a password value or not"
+          },
+          "is_verified": {
+            "type": "boolean",
+            "description": "Indicate whether this provider is verified or not"
+          },
+          "contact_informations": {
+            "type": "array",
+            "description": "List of contact informations related to this provider",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Random unique ID",
+                  "format": "nanoid",
+                  "example": "idn_a9d35175ea94b9367aa18237ca518d99"
+                },
+                "type": {
+                  "description": "Contact information type",
+                  "$ref": "#/components/schemas/ClientUsersIdentifierContactInformationsType"
+                },
+                "value": {
+                  "type": "string",
+                  "description": "Value of given contact information",
+                  "example": "test@example.com"
+                },
+                "is_verified": {
+                  "type": "boolean",
+                  "description": "Indicate whether this contact information is verified or not"
+                }
+              }
+            }
+          },
+          "updated_at": {
+            "type": "integer",
+            "description": "UNIX Timestamp of date last updated",
+            "format": "unixtime",
+            "example": 1739201710547
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "UNIX Timestamp of date created",
+            "format": "unixtime",
+            "example": 1739201710547
+          }
+        },
+        "required": [
+          "id",
+          "provider",
+          "logo",
+          "value",
+          "is_password_enabled",
+          "is_verified",
+          "contact_informations",
+          "updated_at",
+          "created_at"
         ]
       },
       "PostCreateIdentifierBody": {
