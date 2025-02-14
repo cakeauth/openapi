@@ -143,6 +143,53 @@
         }
       }
     },
+    "/v1/identifiers/{identifier_id}": {
+      "delete": {
+        "tags": ["Identifiers"],
+        "description": "Delete an identifier from a user.",
+        "summary": "Delete an identifier",
+        "operationId": "deleteIdentifier",
+        "security": [{ "PrivateKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "identifier_id",
+            "in": "path",
+            "description": "ID of the target identifier",
+            "example": "idn_a9d35175ea94b9367aa18237ca518d99",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete identifier success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/DeleteIdentifierResponse"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
+    },
     "/v1/identifiers/{identifier_id}/set_password": {
       "post": {
         "tags": ["Identifiers"],
@@ -604,8 +651,19 @@
         "properties": {
           "message": {
             "type": "string",
-            "description": "SucResponse message",
+            "description": "Success response message",
             "example": "Password successfully updated"
+          }
+        }
+      },
+      "DeleteIdentifierResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Success response message",
+            "example": "Identifier successfully deleted"
           }
         }
       }
