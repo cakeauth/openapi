@@ -375,7 +375,7 @@
   },
   "components": {
     "schemas": {
-      "Status": { "type": "number", "example": 200 },
+      "Status": { "type": "number", "example": 201 },
       "Metadata": {
         "type": "object",
         "required": ["timestamp", "request_id"],
@@ -447,6 +447,33 @@
           "city": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "CommonTokenResponseItem": {
+        "type": "object",
+        "required": ["name", "value", "expires_at", "domain"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the [cookie](/docs/concepts/how-it-works/cookies#how-cakeauth-uses-cookies).",
+            "example": "__Secure-session.ses_a9d35175ea94b9367aa18237ca518d99"
+          },
+          "value": {
+            "type": "string",
+            "description": "[JWT Token](/docs/concepts/how-it-works/token-refresh#token-format)",
+            "example": "xxx.yyy.zzz"
+          },
+          "expires_at": {
+            "type": "integer",
+            "description": "UNIX Timestamp of date expired",
+            "format": "unixtime",
+            "example": 1739201710547
+          },
+          "domain": {
+            "type": "string",
+            "description": "Target domain this tokens issued to",
+            "example": "https://example.com"
           }
         }
       },
@@ -1024,8 +1051,55 @@
           }
         }
       },
-      "PostCreateSessionBody": {},
-      "PostCreateSessionResponseItem": {}
+      "PostCreateSessionBody": {
+        "type": "object",
+        "required": ["issue_tokens"],
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "CakeAuth ID or user's defined external_id",
+            "example": "0194f092-a25a-700d-a4f6-8b50e865fd00"
+          },
+          "identifier_id": {
+            "type": "string",
+            "description": "Identifier ID. Supporting the `user_id` property.",
+            "example": "idn_a9d35175ea94b9367aa18237ca518d99"
+          },
+          "issue_tokens": {
+            "type": "boolean",
+            "description": "This flags control whether to generate [session-access tokens pair](/docs/concepts/how-it-works/token-refresh#access-token)."
+          },
+          "token_metadata": {
+            "type": "object",
+            "description": "Optional explicit metadata for the tokens",
+            "properties": {
+              "origin": {
+                "type": "string",
+                "description": "Where the request comes from and where it issued to",
+                "example": "https://example.com"
+              }
+            }
+          }
+        }
+      },
+      "PostCreateSessionResponseItem": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/GetSessionsResponseItem"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "token": {
+                "$ref": "#/components/schemas/CommonTokenResponseItem"
+              },
+              "refresh_token": {
+                "$ref": "#/components/schemas/CommonTokenResponseItem"
+              }
+            }
+          }
+        ]
+      }
     },
     "responses": {
       "BadRequestErrorResponse": {
