@@ -23,6 +23,14 @@
     {
       "name": "Identifiers",
       "description": "An identifier is set of informations that being attached to a user that can be used as an authentication identity. Use these sets of endpoints to manage user's identifers. Read more about [direct identifier](/docs/guides/direct/overview) and [social identifiers](/docs/guides/oauth/overview)."
+    },
+    {
+      "name": "Sessions",
+      "description": "A session is is a temporary state that keeps a user authenticated after they authenticate. Use these sets of endpoints to manage sessions for users and its identifiers."
+    },
+    {
+      "name": "Users",
+      "description": "Use these sets of endpoints to manage your user base. Learn more how you can manage users, [here](/docs/guides/manage-users)."
     }
   ],
   "paths": {
@@ -103,7 +111,7 @@
       "post": {
         "tags": ["Identifiers"],
         "description": "Use this endpoint to create a new user identifer",
-        "summary": "Create New User Identifier",
+        "summary": "Create a new user identifier",
         "operationId": "createIdentifier",
         "security": [{ "PrivateKeyAuth": [] }],
         "requestBody": {
@@ -128,7 +136,7 @@
                       "type": "object",
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/PostCreateIdentifierResponse"
+                          "$ref": "#/components/schemas/PostCreateIdentifierResponseItem"
                         }
                       }
                     }
@@ -175,7 +183,7 @@
                       "type": "object",
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/DeleteIdentifierResponse"
+                          "$ref": "#/components/schemas/DeleteIdentifierResponseItem"
                         }
                       }
                     }
@@ -232,7 +240,124 @@
                       "type": "object",
                       "properties": {
                         "data": {
-                          "$ref": "#/components/schemas/PostSetIdentifierPasswordResponse"
+                          "$ref": "#/components/schemas/PostSetIdentifierPasswordResponseItem"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
+    },
+    "/v1/sessions": {
+      "get": {
+        "tags": ["Sessions"],
+        "summary": "List sessions",
+        "description": "Retrieve a paginated list of sessions filtered by user ID",
+        "operationId": "getSessions",
+        "security": [{ "PrivateKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page",
+            "example": 1,
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 1,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Pagination data size",
+            "example": 10,
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "description": "CakeAuth ID or user's defined external_id",
+            "example": "0194f092-a25a-700d-a4f6-8b50e865fd00",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 64
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of sessions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/GetSessionsResponseItem"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      },
+      "post": {
+        "tags": ["Sessions"],
+        "description": "Use this endpoint to create a new session for a user/identifiers",
+        "summary": "Create new session",
+        "operationId": "postCreateSession",
+        "security": [{ "PrivateKeyAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostCreateSessionBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Session created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/PostCreateSessionResponseItem"
                         }
                       }
                     }
@@ -287,6 +412,74 @@
           "error": { "type": "null" },
           "data": { "type": "object", "nullable": true }
         }
+      },
+      "SessionActivityMetadata": {
+        "type": "object",
+        "properties": {
+          "is_mobile": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "user_agent": {
+            "type": "string",
+            "nullable": true
+          },
+          "browser_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "browser_version": {
+            "type": "string",
+            "nullable": true
+          },
+          "device_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "ip": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "SessionActivityLogItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "session_id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "member_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "identifier_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/SessionActivityMetadata",
+            "nullable": true
+          }
+        },
+        "required": ["id", "session_id", "type"]
       },
       "TenantOrganizationStatus": {
         "type": "string",
@@ -546,7 +739,7 @@
           }
         }
       },
-      "PostCreateIdentifierResponse": {
+      "PostCreateIdentifierResponseItem": {
         "type": "object",
         "required": [
           "id",
@@ -645,7 +838,7 @@
           }
         }
       },
-      "PostSetIdentifierPasswordResponse": {
+      "PostSetIdentifierPasswordResponseItem": {
         "type": "object",
         "required": ["message"],
         "properties": {
@@ -656,7 +849,7 @@
           }
         }
       },
-      "DeleteIdentifierResponse": {
+      "DeleteIdentifierResponseItem": {
         "type": "object",
         "required": ["message"],
         "properties": {
@@ -666,7 +859,173 @@
             "example": "Identifier successfully deleted"
           }
         }
-      }
+      },
+      "GetSessionsResponseItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "user",
+          "status",
+          "identifiers",
+          "updated_at",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Random unique ID",
+            "format": "nanoid",
+            "example": "ses_a9d35175ea94b9367aa18237ca518d99"
+          },
+          "user": {
+            "type": "object",
+            "description": "User data of the current session",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Random unique ID",
+                "format": "nanoid",
+                "example": "idn_a9d35175ea94b9367aa18237ca518d99"
+              },
+              "external_id": {
+                "type": "string",
+                "description": "Tenant's defined unique ID",
+                "format": "string",
+                "example": "0194f092-a25a-700d-a4f6-8b50e865fd00",
+                "minimum": 1,
+                "maximum": 64
+              }
+            }
+          },
+          "status": {
+            "description": "Sesison status",
+            "$ref": "#/components/schemas/AccessClientUsersSessionsStatus"
+          },
+          "metadata": {
+            "description": "Session's metadata",
+            "$ref": "#/components/schemas/SessionActivityMetadata"
+          },
+          "identifiers": {
+            "type": "array",
+            "description": "List of identifiers of current user's identifiers",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Random unique ID",
+                  "format": "nanoid",
+                  "example": "idn_a9d35175ea94b9367aa18237ca518d99"
+                },
+                "provider": {
+                  "description": "Current identifier's provider",
+                  "$ref": "#/components/schemas/ClientUsersIdentifiersProvider"
+                },
+                "logo": {
+                  "type": "string",
+                  "format": "link",
+                  "description": "Link to provider logo",
+                  "example": "https://cdn.cakeauth.com/socials/apple.svg"
+                },
+                "value": {
+                  "type": "string",
+                  "description": "Identifier value (e.g., email or phone number)",
+                  "example": "test@example.com"
+                },
+                "is_current": {
+                  "type": "boolean",
+                  "description": "Whether this identifier is the currently active one (used in the current session data)"
+                },
+                "is_password_enabled": {
+                  "type": "boolean",
+                  "description": "Whether a password is enabled for this identifier"
+                },
+                "is_verified": {
+                  "type": "boolean",
+                  "description": "Whether this identifier has been verified"
+                },
+                "contact_informations": {
+                  "type": "array",
+                  "description": "List of associated contact information",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "Random unique ID for contact information"
+                      },
+                      "type": {
+                        "description": "Type of contact information",
+                        "$ref": "#/components/schemas/ClientUsersIdentifierContactInformationsType"
+                      },
+                      "value": {
+                        "type": "string",
+                        "description": "Contact information value (e.g., email address, phone number)"
+                      },
+                      "is_verified": {
+                        "type": "boolean",
+                        "description": "Whether the contact information has been verified"
+                      }
+                    },
+                    "required": ["id", "type", "value", "is_verified"]
+                  }
+                },
+                "updated_at": {
+                  "type": "integer",
+                  "description": "UNIX Timestamp of date last updated",
+                  "format": "int64",
+                  "example": 1739201710547
+                },
+                "created_at": {
+                  "type": "integer",
+                  "description": "UNIX Timestamp of date created",
+                  "format": "int64",
+                  "example": 1739201710547
+                }
+              },
+              "required": [
+                "id",
+                "provider",
+                "logo",
+                "value",
+                "is_current",
+                "is_password_enabled",
+                "is_verified",
+                "contact_informations",
+                "updated_at",
+                "created_at"
+              ]
+            }
+          },
+
+          "expires_at": {
+            "type": "integer",
+            "description": "UNIX Timestamp of date expired",
+            "format": "unixtime",
+            "example": 1739201710547
+          },
+          "revoked_at": {
+            "type": "integer",
+            "description": "UNIX Timestamp of date revoked",
+            "format": "unixtime",
+            "example": 1739201710547
+          },
+          "updated_at": {
+            "type": "integer",
+            "description": "UNIX Timestamp of date last updated",
+            "format": "unixtime",
+            "example": 1739201710547
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "UNIX Timestamp of date created",
+            "format": "unixtime",
+            "example": 1739201710547
+          }
+        }
+      },
+      "PostCreateSessionBody": {},
+      "PostCreateSessionResponseItem": {}
     },
     "responses": {
       "BadRequestErrorResponse": {
