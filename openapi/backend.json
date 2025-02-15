@@ -371,6 +371,116 @@
           "500": { "$ref": "#/components/responses/ErrorResponse" }
         }
       }
+    },
+    "/v1/sessions/{session_id}/tokens": {
+      "post": {
+        "tags": ["Sessions"],
+        "description": "Refresh access token for a specific session. Learn more about sessions refresh mechanism, [here](/docs/concepts/how-it-works/token-refresh).",
+        "summary": "Refresh access token",
+        "operationId": "postRefreshSessionToken",
+        "security": [{ "PrivateKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "description": "ID of the target session",
+            "example": "ses_a9d35175ea94b9367aa18237ca518d99",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EmptyObject" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token refreshed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/PostRefreshSessionTokenResponseItem"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
+    },
+    "/v1/sessions/{session_id}/revoke": {
+      "post": {
+        "tags": ["Sessions"],
+        "description": "Revoke a specific session. The session's `status` will be changed to `revoked` and session is not valid and cannot be refreshed and/or used anymore.",
+        "summary": "Revoke access token",
+        "operationId": "postRevokeSession",
+        "security": [{ "PrivateKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "description": "ID of the target session",
+            "example": "ses_a9d35175ea94b9367aa18237ca518d99",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EmptyObject" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session's revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/PostRevokeSessionResponseItem"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
     }
   },
   "components": {
@@ -449,6 +559,10 @@
             "nullable": true
           }
         }
+      },
+      "EmptyObject": {
+        "type": "object",
+        "properties": {}
       },
       "CommonTokenResponseItem": {
         "type": "object",
@@ -979,7 +1093,8 @@
                     "properties": {
                       "id": {
                         "type": "string",
-                        "description": "Random unique ID for contact information"
+                        "description": "Random unique ID for contact information",
+                        "example": "idn_a9d35175ea94b9367aa18237ca518d99"
                       },
                       "type": {
                         "description": "Type of contact information",
@@ -987,7 +1102,8 @@
                       },
                       "value": {
                         "type": "string",
-                        "description": "Contact information value (e.g., email address, phone number)"
+                        "description": "Contact information value (e.g., email address, phone number)",
+                        "example": "test@example.com"
                       },
                       "is_verified": {
                         "type": "boolean",
@@ -1097,6 +1213,28 @@
                 "$ref": "#/components/schemas/CommonTokenResponseItem"
               }
             }
+          }
+        ]
+      },
+      "PostRefreshSessionTokenResponseItem": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/GetSessionsResponseItem"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "token": {
+                "$ref": "#/components/schemas/CommonTokenResponseItem"
+              }
+            }
+          }
+        ]
+      },
+      "PostRevokeSessionResponseItem": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/GetSessionsResponseItem"
           }
         ]
       }
