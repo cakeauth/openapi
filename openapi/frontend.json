@@ -13,14 +13,27 @@
       "url": "http://github.com/cakeauth/openapi/LICENSE"
     }
   },
+  "security": [{ "AccessTokenAuth": [] }],
   "servers": [
     {
       "url": "https://{host}.live.cakeauth.app",
-      "description": "Production environment"
+      "description": "Production environment host URL",
+      "variables": {
+        "host": {
+          "description": "Subdomain for your the production environment host",
+          "default": "example"
+        }
+      }
     },
     {
       "url": "https://{host}.test.cakeauth.app",
-      "description": "Development environment"
+      "description": "Development environment host URL",
+      "variables": {
+        "host": {
+          "description": "Subdomain for your development environment host",
+          "default": "example"
+        }
+      }
     }
   ],
   "tags": [
@@ -61,9 +74,20 @@
     "/ping": {
       "get": {
         "tags": ["General"],
+        "security": [{ "NoAuth": [] }],
         "summary": "Ping-pong",
         "description": "Ping your environment instance",
         "operationId": "getPing",
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "text/plain"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Pong response",
@@ -83,9 +107,28 @@
     "/.well-known/jwks.json": {
       "get": {
         "tags": ["General"],
+        "security": [{ "NoAuth": [] }],
         "summary": "Get JWKS Keys",
         "description": "Retrieve list of dedicated JWKS keys for current environment. Learn more about JWKS keys, [here](/docs/concepts/signature).",
         "operationId": "getJWKS",
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Return  list of JWKS keys",
@@ -101,6 +144,414 @@
           "500": { "$ref": "#/components/responses/ErrorResponse" }
         }
       }
+    },
+    "/v1/me": {
+      "get": {
+        "tags": ["Me"],
+        "summary": "Get current user details",
+        "description": "Retrieve a detailed data for current authorized users",
+        "operationId": "getMe",
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-cakeauth-public-key",
+            "schema": {
+              "type": "string",
+              "format": "public_key",
+              "example": "pub_test_c3ViZG9tYWluLmV4YW1wbGUuY29t"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A detailed user's data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/GetMeResponseItem"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
+    },
+    "/v1/me/reset_password": {
+      "post": {
+        "tags": ["Me"],
+        "description": "Reset password for current authenticated users.",
+        "summary": "Reset current user's password",
+        "operationId": "postMeResetPassword",
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-cakeauth-public-key",
+            "schema": {
+              "type": "string",
+              "format": "public_key",
+              "example": "pub_test_c3ViZG9tYWluLmV4YW1wbGUuY29t"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostMeResetPasswordBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/PostMeResetPasswordResponseItem"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
+    },
+    "/v1/oauth/callback": {
+      "get": {
+        "tags": ["OAuth"],
+        "summary": "OAuth callback",
+        "description": "Callback endpoints for OAuth process. This endpoint exchange code from AOuth providers with access & session token. Read more about OAuth process, [here](/docs/concepts/how-it-works/oauth).",
+        "operationId": "getClientsOAuthCallback",
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "text/plain"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-cakeauth-public-key",
+            "schema": {
+              "type": "string",
+              "format": "public_key",
+              "example": "pub_test_c3ViZG9tYWluLmV4YW1wbGUuY29t"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "code",
+            "schema": {
+              "type": "string",
+              "format": "oauth_callback_code",
+              "example": "123123123"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "state",
+            "schema": {
+              "type": "string",
+              "format": "OAuthState",
+              "description": "[Encoded form](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURI) of [`OAuthState` type](/sdk/types#oauthstate)."
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "301": {
+            "description": "OAuth callback redirected succesfully",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "https://example.com"
+              }
+            },
+            "content": {
+              "text/plain": {
+                "schema": {}
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
+    },
+    "/v1/reset_password/attempts": {
+      "post": {
+        "tags": ["Reset Password"],
+        "security": [{ "NoAuth": [] }],
+        "description": "Create a reset password request for **authenticated/anonymous** users. Learn more about password reset attempt process, [here](/docs/guides/reset-password#anonymousunauthenticated)",
+        "summary": "Create reset password attempt",
+        "operationId": "postMeResetPassword",
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-cakeauth-public-key",
+            "schema": {
+              "type": "string",
+              "format": "public_key",
+              "example": "pub_test_c3ViZG9tYWluLmV4YW1wbGUuY29t"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostAttemptResetPasswordBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset attempt created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/PostAttemptResetPasswordResponseItem"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
+    },
+    "/v1/reset_password/attempts/{attempt_id}/verify": {
+      "post": {
+        "tags": ["Reset Password"],
+        "security": [{ "NoAuth": [] }],
+        "description": "Verify a reset password request (by **authenticated/anonymous** users). Learn more about password reset attempt process, [here](/docs/guides/reset-password#anonymousunauthenticated)",
+        "summary": "Verify a reset password attempt",
+        "operationId": "postVerifyResetPasswordAttempt",
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "in": "path",
+            "name": "attempt_id",
+            "schema": {
+              "type": "string",
+              "format": "id",
+              "example": "atm_p2n21pe9filh8v5o98nja9j5zdtrkdfr"
+            },
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "x-cakeauth-public-key",
+            "schema": {
+              "type": "string",
+              "format": "public_key",
+              "example": "pub_test_c3ViZG9tYWluLmV4YW1wbGUuY29t"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostVerifyResetPasswordAttemptBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password resetted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/PostVerifyResetPasswordAttemptResponseItem"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
+    },
+    "/v1/sessions": {
+      "get": {}
+    },
+    "/v1/sessions/details": {
+      "get": {}
+    },
+    "/v1/sessions/handshake/{handshake_token}": {
+      "get": {}
+    },
+    "/v1/sessions/tokens": {
+      "post": {}
+    },
+    "/v1/sessions/revoke": {
+      "post": {}
+    },
+    "/v1/settings": {
+      "get": {}
+    },
+    "/v1/signin/strategies": {
+      "post": {}
+    },
+    "/v1/signin/attempts": {
+      "post": {}
+    },
+    "/v1/signin/attempts/{attempt_id}/verify": {
+      "post": {}
+    },
+    "/v1/signup/attempts": {
+      "post": {}
+    },
+    "/v1/signup/attempts/{attempt_id}/verify": {
+      "post": {}
     }
   },
   "components": {
@@ -408,7 +859,14 @@
             }
           }
         }
-      }
+      },
+      "GetMeResponseItem": {},
+      "PostMeResetPasswordBody": {},
+      "PostMeResetPasswordResponseItem": {},
+      "PostAttemptResetPasswordBody": {},
+      "PostAttemptResetPasswordResponseItem": {},
+      "PostVerifyResetPasswordAttemptBody": {},
+      "PostVerifyResetPasswordAttemptResponseItem": {}
     },
     "responses": {
       "BadRequestErrorResponse": {
@@ -493,7 +951,9 @@
     "securitySchemes": {
       "AccessTokenAuth": {
         "type": "http",
-        "scheme": "bearer"
+        "description": "Access token",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }
