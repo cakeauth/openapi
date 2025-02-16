@@ -13,6 +13,7 @@
       "url": "http://github.com/cakeauth/openapi/LICENSE"
     }
   },
+  "security": [{ "PrivateKeyAuth": [] }],
   "servers": [
     {
       "url": "https://api.cakeauth.com",
@@ -40,8 +41,23 @@
         "summary": "List identifiers",
         "description": "Retrieve a paginated list of identifiers filtered by user ID",
         "operationId": "getIdentifiers",
-        "security": [{ "PrivateKeyAuth": [] }],
         "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
           {
             "name": "page",
             "in": "query",
@@ -113,7 +129,24 @@
         "description": "Use this endpoint to create a new user identifer",
         "summary": "Create a new user identifier",
         "operationId": "createIdentifier",
-        "security": [{ "PrivateKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -157,8 +190,23 @@
         "description": "Delete an identifier from a user.",
         "summary": "Delete an identifier",
         "operationId": "deleteIdentifier",
-        "security": [{ "PrivateKeyAuth": [] }],
         "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
           {
             "name": "identifier_id",
             "in": "path",
@@ -204,8 +252,23 @@
         "description": "Set a password to a specific identifier data. Only works with [direct identifier](/docs/guides/direct/overview).",
         "summary": "Set password to identifier",
         "operationId": "setIdentifierPassword",
-        "security": [{ "PrivateKeyAuth": [] }],
         "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
           {
             "name": "identifier_id",
             "in": "path",
@@ -261,8 +324,23 @@
         "summary": "List sessions",
         "description": "Retrieve a paginated list of sessions filtered by user ID",
         "operationId": "getSessions",
-        "security": [{ "PrivateKeyAuth": [] }],
         "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
           {
             "name": "page",
             "in": "query",
@@ -334,7 +412,24 @@
         "description": "Use this endpoint to create a new session for a user/identifiers",
         "summary": "Create new session",
         "operationId": "postCreateSession",
-        "security": [{ "PrivateKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -378,8 +473,23 @@
         "description": "Refresh access token for a specific session. Learn more about sessions refresh mechanism, [here](/docs/concepts/how-it-works/token-refresh).",
         "summary": "Refresh access token",
         "operationId": "postRefreshSessionToken",
-        "security": [{ "PrivateKeyAuth": [] }],
         "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
           {
             "name": "session_id",
             "in": "path",
@@ -433,8 +543,23 @@
         "description": "Revoke a specific session. The session's `status` will be changed to `revoked` and session is not valid and cannot be refreshed and/or used anymore.",
         "summary": "Revoke access token",
         "operationId": "postRevokeSession",
-        "security": [{ "PrivateKeyAuth": [] }],
         "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
           {
             "name": "session_id",
             "in": "path",
@@ -488,8 +613,23 @@
         "summary": "List users",
         "description": "Retrieve a paginated list of users in the current environment",
         "operationId": "getUsers",
-        "security": [{ "PrivateKeyAuth": [] }],
         "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
           {
             "name": "page",
             "in": "query",
@@ -568,7 +708,24 @@
         "description": "Use this endpoint to create a new user data (optionally along with its identifier).",
         "summary": "Create a new user",
         "operationId": "postCreateUser",
-        "security": [{ "PrivateKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -612,8 +769,23 @@
         "description": "Get a details of a user's data",
         "summary": "Get user's details",
         "operationId": "getUserDetail",
-        "security": [{ "PrivateKeyAuth": [] }],
         "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
           {
             "name": "user_id",
             "in": "path",
@@ -658,8 +830,23 @@
         "description": "Delete a user in an environment.",
         "summary": "Delete a user",
         "operationId": "deleteUser",
-        "security": [{ "PrivateKeyAuth": [] }],
         "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
           {
             "name": "user_id",
             "in": "path",
@@ -706,8 +893,24 @@
         "description": "Ban a user. By banning a user, all of the existing sessions will be revoked and user's cannot be issued a token or do any activities (eg. signing in, signing up, reset password, etc).",
         "summary": "Ban a user",
         "operationId": "postBanUser",
-        "security": [{ "PrivateKeyAuth": [] }],
         "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
+
           {
             "name": "user_id",
             "in": "path",
@@ -762,8 +965,23 @@
         "description": "Un-ban a user. By un-bannng a user, user's will be able to interact with your applications and can be issued a token and can do any activities (eg. signing in, signing up, reset password, etc).",
         "summary": "Un-ban a user",
         "operationId": "postUnbanUser",
-        "security": [{ "PrivateKeyAuth": [] }],
         "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json "
+            }
+          },
           {
             "name": "user_id",
             "in": "path",
@@ -1871,7 +2089,8 @@
     "securitySchemes": {
       "PrivateKeyAuth": {
         "type": "http",
-        "scheme": "bearer"
+        "scheme": "bearer",
+        "description": "Your private key"
       }
     }
   }
