@@ -54,7 +54,7 @@
     },
     {
       "name": "General",
-      "description": "General API keys"
+      "description": "General API endpoints"
     }
   ],
   "paths": {
@@ -66,10 +66,13 @@
         "operationId": "getPing",
         "responses": {
           "200": {
-            "description": "Pong",
+            "description": "Pong response",
             "content": {
               "text/plain": {
-                "example": "Pong"
+                "schema": {
+                  "type": "string"
+                },
+                "example": "pong"
               }
             }
           },
