@@ -22,5 +22,476 @@
       "url": "https://{host}.test.cakeauth.app",
       "description": "Development environment"
     }
-  ]
+  ],
+  "tags": [
+    {
+      "name": "Me",
+      "description": "Use this set of endpoints to interact with **currently authorized** user."
+    },
+    {
+      "name": "OAuth",
+      "description": "Set of endpoint for OAuth callback. Read more about OAuth process [here](/docs/concepts/how-it-works/oauth#how-it-works), and learn to set it up [here](/docs/guides/oauth/overview)."
+    },
+    {
+      "name": "Reset Password",
+      "description": "Use this set of endpoints for the **unauthenticated/anonymous** password reset process. Learn more about password reset process, [here](/docs/guides/reset-password)."
+    },
+    {
+      "name": "Sessions",
+      "description": "A session is is a temporary state that keeps a user authenticated after they authenticate. Use this set of endpoints to manage sessions for users and its identifiers."
+    },
+    {
+      "name": "Settings",
+      "description": "Use this set of endpoints to interact with current environment settings. Read more about environment, [here](/docs/concepts/structure#3-environments)."
+    },
+    {
+      "name": "Sign In",
+      "description": "Use this set of endpoints for the **unauthenticated/anonymous** signin process. Learn more about authentication process, [here](/docs/concepts/how-it-works/authentication)."
+    },
+    {
+      "name": "Sign Up",
+      "description": "Use this set of endpoints for the **unauthenticated/anonymous** registration process. Learn more about authentication process, [here](/docs/concepts/how-it-works/authentication)."
+    },
+    {
+      "name": "General",
+      "description": "General API keys"
+    }
+  ],
+  "paths": {
+    "/ping": {
+      "get": {
+        "tags": ["General"],
+        "summary": "Ping-pong",
+        "description": "Ping your environment instance",
+        "operationId": "getPing",
+        "responses": {
+          "200": {
+            "description": "Pong",
+            "content": {
+              "text/plain": {
+                "example": "Pong"
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
+    },
+    "/.well-known/jwks.json": {
+      "get": {
+        "tags": ["General"],
+        "summary": "Get JWKS Keys",
+        "description": "Retrieve list of dedicated JWKS keys for current environment. Learn more about JWKS keys, [here](/docs/concepts/signature).",
+        "operationId": "getJWKS",
+        "responses": {
+          "200": {
+            "description": "Return  list of JWKS keys",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetJWKSResponseItem"
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Status": { "type": "number", "example": 201 },
+      "Metadata": {
+        "type": "object",
+        "required": ["timestamp", "request_id"],
+        "properties": {
+          "timestamp": { "type": "number", "example": 1707580800000 },
+          "request_id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "req_a9d35175ea94b9367aa18237ca518d99"
+          },
+          "page": { "type": "number", "nullable": true },
+          "page_size": { "type": "number", "nullable": true },
+          "total": { "type": "number", "nullable": true }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "nullable": true,
+        "properties": {
+          "url": {
+            "type": "string",
+            "example": "https://docs.cakeauth.com/docs/references/errors#not_found"
+          },
+          "code": { "type": "string", "example": "not_found" },
+          "message": { "type": "string", "example": "Resources not found" }
+        }
+      },
+      "ApiResponseWrapper": {
+        "type": "object",
+        "required": ["status", "metadata", "error", "data"],
+        "properties": {
+          "status": { "$ref": "#/components/schemas/Status" },
+          "metadata": { "$ref": "#/components/schemas/Metadata" },
+          "error": { "type": "null" },
+          "data": { "type": "object", "nullable": true }
+        }
+      },
+      "SessionActivityMetadata": {
+        "type": "object",
+        "properties": {
+          "is_mobile": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "user_agent": {
+            "type": "string",
+            "nullable": true
+          },
+          "browser_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "browser_version": {
+            "type": "string",
+            "nullable": true
+          },
+          "device_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "ip": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "EmptyObject": {
+        "type": "object",
+        "properties": {}
+      },
+      "CommonTokenResponseItem": {
+        "type": "object",
+        "required": ["name", "value", "expires_at", "domain"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the [cookie](/docs/concepts/how-it-works/cookies#how-cakeauth-uses-cookies).",
+            "example": "__Secure-session.ses_a9d35175ea94b9367aa18237ca518d99"
+          },
+          "value": {
+            "type": "string",
+            "description": "[JWT Token](/docs/concepts/how-it-works/token-refresh#token-format)",
+            "example": "xxx.yyy.zzz"
+          },
+          "expires_at": {
+            "type": "integer",
+            "description": "UNIX Timestamp of date expired",
+            "format": "unixtime",
+            "example": 1739201710547
+          },
+          "domain": {
+            "type": "string",
+            "description": "Target domain this tokens issued to",
+            "example": "https://example.com"
+          }
+        }
+      },
+      "SessionActivityLogItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "session_id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "member_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "identifier_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/SessionActivityMetadata",
+            "nullable": true
+          }
+        },
+        "required": ["id", "session_id", "type"]
+      },
+      "TenantOrganizationStatus": {
+        "type": "string",
+        "enum": ["active", "inactive"]
+      },
+      "TenantMembersProvider": {
+        "type": "string",
+        "enum": ["github", "google", "email"]
+      },
+      "TenantMembersStatus": {
+        "type": "string",
+        "enum": ["active", "inactive", "banned", "pending"]
+      },
+      "AccessClientUsersAttemptsType": {
+        "type": "string",
+        "enum": ["signin", "signup", "password_reset", "handshake"]
+      },
+      "AccessClientUsersAttemptsStatus": {
+        "type": "string",
+        "enum": ["active", "used", "revoked"]
+      },
+      "AccessTenantMembersAttemptsType": {
+        "type": "string",
+        "enum": ["password_reset", "signup"]
+      },
+      "AccessTenantMembersAttemptsStatus": {
+        "type": "string",
+        "enum": ["active", "used", "revoked"]
+      },
+      "TenantProjectsStatus": {
+        "type": "string",
+        "enum": ["active", "inactive"]
+      },
+      "TenantKeysType": {
+        "type": "string",
+        "enum": ["public", "private"]
+      },
+      "AccessTenantMembersSessionsStatus": {
+        "type": "string",
+        "enum": ["active", "expired", "replaced", "revoked"]
+      },
+      "ClientUsersStatus": {
+        "type": "string",
+        "enum": ["active", "banned", "invited"]
+      },
+      "ClientUsersIdentifiersProvider": {
+        "type": "string",
+        "enum": [
+          "email",
+          "username",
+          "phone",
+          "google",
+          "facebook",
+          "apple",
+          "github",
+          "microsoft",
+          "linkedin",
+          "dropbox",
+          "twitch",
+          "discord",
+          "tiktok",
+          "gitlab",
+          "slack"
+        ]
+      },
+      "ClientUsersIdentifierContactInformationsType": {
+        "type": "string",
+        "enum": ["email", "phone"]
+      },
+      "AccessClientUsersSessionsStatus": {
+        "type": "string",
+        "enum": ["active", "expired", "replaced", "revoked", "timeout"]
+      },
+      "SettingsTenantEnvironmentsTimeUnit": {
+        "type": "string",
+        "enum": ["day", "hour", "minute", "second"]
+      },
+      "SettingsTenantEnvironmentsCaptchaType": {
+        "type": "string",
+        "enum": ["turnstile", "recaptcha"]
+      },
+      "SettingsTenantContactInformationsProvider": {
+        "type": "string",
+        "enum": ["email", "phone", "username", "provider_id"]
+      },
+      "SettingsTenantAuthenticationStrategiesProvider": {
+        "type": "string",
+        "enum": [
+          "email",
+          "phone_sms",
+          "phone_call",
+          "phone_whatsapp",
+          "username",
+          "username_email",
+          "username_sms",
+          "username_whatsapp"
+        ]
+      },
+      "SettingsTenantAuthenticationStrategiesMethod": {
+        "type": "string",
+        "enum": ["password", "code", "magic_link"]
+      },
+      "SettingsTenantIdentifiersProvider": {
+        "type": "string",
+        "enum": [
+          "email",
+          "username",
+          "phone",
+          "google",
+          "facebook",
+          "apple",
+          "github",
+          "microsoft",
+          "linkedin",
+          "dropbox",
+          "twitch",
+          "discord",
+          "tiktok",
+          "gitlab",
+          "slack"
+        ]
+      },
+      "GetJWKSResponseItem": {
+        "type": "array",
+        "description": "Array of JWKS keys",
+        "items": {
+          "type": "object",
+          "required": ["kid", "alg", "kty", "n", "e", "use"],
+          "properties": {
+            "kid": {
+              "type": "string",
+              "description": "Key ID",
+              "example": "key_qziojlr8u7rczho7xqkr2gdvygnj1lw5"
+            },
+            "alg": {
+              "type": "string",
+              "description": "Algorithm",
+              "example": "RS256"
+            },
+            "kty": {
+              "type": "string",
+              "description": "Key Type",
+              "example": "RSA"
+            },
+            "n": {
+              "type": "string",
+              "description": "RSA Modulus",
+              "example": "<public-key-modulus>"
+            },
+            "e": {
+              "type": "string",
+              "description": "RSA Exponent",
+              "example": "AQAB"
+            },
+            "use": {
+              "type": "string",
+              "description": "Key Usage",
+              "example": "sig",
+              "enum": ["sig", "enc"]
+            },
+            "ext": {
+              "type": "boolean",
+              "description": "Indicates whether the key is extractable",
+              "example": true
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "BadRequestErrorResponse": {
+        "description": "Bad request error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "null" },
+                    "status": { "example": 400 },
+                    "error": {
+                      "example": {
+                        "url": "https://docs.cakeauth.com/docs/references/errors#bad_request",
+                        "code": "bad_request",
+                        "message": "Invalid payload"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "UnauthorizedErrorResponse": {
+        "description": "Unauthorized response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "null" },
+                    "status": { "example": 401 },
+                    "error": {
+                      "example": {
+                        "url": "https://docs.cakeauth.com/docs/references/errors#unauthorized",
+                        "code": "unauthorized",
+                        "message": "Unauthorized"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "description": "Error response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "null" },
+                    "status": { "example": 500 },
+                    "error": {
+                      "example": {
+                        "url": "https://docs.cakeauth.com/docs/references/errors#internal_server_error",
+                        "code": "internal_server_error",
+                        "message": "Internal server error"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "AccessTokenAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
 }

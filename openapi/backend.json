@@ -22,15 +22,15 @@
   "tags": [
     {
       "name": "Identifiers",
-      "description": "An identifier is set of informations that being attached to a user that can be used as an authentication identity. Use these sets of endpoints to manage user's identifers. Read more about [direct identifier](/docs/guides/direct/overview) and [social identifiers](/docs/guides/oauth/overview)."
+      "description": "An identifier is set of informations that being attached to a user that can be used as an authentication identity. Use this set of endpoints to manage user's identifers. Read more about [direct identifier](/docs/guides/direct/overview) and [social identifiers](/docs/guides/oauth/overview)."
     },
     {
       "name": "Sessions",
-      "description": "A session is is a temporary state that keeps a user authenticated after they authenticate. Use these sets of endpoints to manage sessions for users and its identifiers."
+      "description": "A session is is a temporary state that keeps a user authenticated after they authenticate. Use this set of endpoints to manage sessions for users and its identifiers."
     },
     {
       "name": "Users",
-      "description": "Use these sets of endpoints to manage your user base. Learn more how you can manage users, [here](/docs/guides/manage-users)."
+      "description": "Use this set of endpoints to manage your user base. Learn more how you can manage users, [here](/docs/guides/manage-users)."
     }
   ],
   "paths": {
