@@ -148,7 +148,7 @@
     "/v1/me": {
       "get": {
         "tags": ["Me"],
-        "summary": "Get current user details",
+        "summary": "Get Current User Details",
         "description": "Retrieve a detailed data for current authorized users",
         "operationId": "getMe",
         "parameters": [
@@ -213,7 +213,7 @@
       "post": {
         "tags": ["Me"],
         "description": "Reset password for current authenticated users.",
-        "summary": "Reset current user's password",
+        "summary": "Reset Current User's Password",
         "operationId": "postMeResetPassword",
         "parameters": [
           {
@@ -286,7 +286,7 @@
     "/v1/oauth/callback": {
       "get": {
         "tags": ["OAuth"],
-        "summary": "OAuth callback",
+        "summary": "OAuth Callback",
         "description": "Callback endpoints for OAuth process. This endpoint exchange code from AOuth providers with access & session token. Read more about OAuth process, [here](/docs/concepts/how-it-works/oauth).",
         "operationId": "getClientsOAuthCallback",
         "parameters": [
@@ -365,7 +365,7 @@
         "tags": ["Reset Password"],
         "security": [{ "NoAuth": [] }],
         "description": "Create a reset password request for **authenticated/anonymous** users. Learn more about password reset attempt process, [here](/docs/guides/reset-password#anonymousunauthenticated)",
-        "summary": "Create reset password attempt",
+        "summary": "Create a Reset Password Attempt",
         "operationId": "postMeResetPassword",
         "parameters": [
           {
@@ -440,7 +440,7 @@
         "tags": ["Reset Password"],
         "security": [{ "NoAuth": [] }],
         "description": "Verify a reset password request (by **authenticated/anonymous** users). Learn more about password reset attempt process, [here](/docs/guides/reset-password#anonymousunauthenticated)",
-        "summary": "Verify a reset password attempt",
+        "summary": "Verify a Reset Password Attempt",
         "operationId": "postVerifyResetPasswordAttempt",
         "parameters": [
           {
@@ -521,19 +521,378 @@
       }
     },
     "/v1/sessions": {
-      "get": {}
+      "get": {
+        "tags": ["Sessions"],
+        "summary": "List Sessions",
+        "description": "Retrieve a paginated list of sessions for currently authanticated user",
+        "operationId": "getSessions",
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page",
+            "example": 1,
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 1,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Pagination data size",
+            "example": 10,
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Comma-separated filter. Accepts the [session's `status` types](#/reference/model/accessslientUserssessionsstatus)",
+            "example": "active,revoked",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-cakeauth-public-key",
+            "schema": {
+              "type": "string",
+              "format": "public_key",
+              "example": "pub_test_c3ViZG9tYWluLmV4YW1wbGUuY29t"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of sessions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/GetSessionsResponseItem"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
     },
     "/v1/sessions/details": {
-      "get": {}
+      "get": {
+        "tags": ["Sessions"],
+        "summary": "Get Current Session Details",
+        "description": "Retrieve details about currently active session",
+        "operationId": "getSessionDetails",
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-cakeauth-public-key",
+            "schema": {
+              "type": "string",
+              "format": "public_key",
+              "example": "pub_test_c3ViZG9tYWluLmV4YW1wbGUuY29t"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Details of current session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/GetSessionDetailsResponseItem"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
     },
     "/v1/sessions/handshake/{handshake_token}": {
-      "get": {}
+      "get": {
+        "tags": ["Sessions"],
+        "summary": "Handshake Token Exchange",
+        "description": "Exchange a handshake token from [OAuth process](/docs/concepts/how-it-works/oauth) with [access token and session token](/docs/concepts/how-it-works/token-refresh#access-token).",
+        "operationId": "getHandshakeSession",
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "in": "path",
+            "name": "handshake_token",
+            "schema": {
+              "type": "string",
+              "format": "id",
+              "example": "tok_p2n21pe9filh8v5o98nja9j5zdtrkdfr"
+            },
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "x-cakeauth-public-key",
+            "schema": {
+              "type": "string",
+              "format": "public_key",
+              "example": "pub_test_c3ViZG9tYWluLmV4YW1wbGUuY29t"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Details of current session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/GetHandshakeSessionResponseItem"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
     },
     "/v1/sessions/tokens": {
-      "post": {}
+      "post": {
+        "tags": ["Sessions"],
+        "description": "Refresh access token for currently active session. Learn more about sessions refresh mechanism, [here](/docs/concepts/how-it-works/token-refresh).",
+        "summary": "Refresh Current Access Token",
+        "operationId": "postRefreshSessionToken",
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-cakeauth-public-key",
+            "schema": {
+              "type": "string",
+              "format": "public_key",
+              "example": "pub_test_c3ViZG9tYWluLmV4YW1wbGUuY29t"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EmptyObject" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token refreshed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/PostRefreshAccessTokenResponseItem"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
     },
     "/v1/sessions/revoke": {
-      "post": {}
+      "post": {
+        "tags": ["Sessions"],
+        "description": "Revoke currently active session. The session's `status` will be changed to `revoked` and session is not valid and cannot be refreshed and/or used anymore.",
+        "summary": "Revoke Current Session",
+        "operationId": "postRevokeSession",
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-cakeauth-public-key",
+            "schema": {
+              "type": "string",
+              "format": "public_key",
+              "example": "pub_test_c3ViZG9tYWluLmV4YW1wbGUuY29t"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EmptyObject" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session's revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/PostRevokeSessionResponseItem"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
     },
     "/v1/settings": {
       "get": {}
@@ -866,7 +1225,12 @@
       "PostAttemptResetPasswordBody": {},
       "PostAttemptResetPasswordResponseItem": {},
       "PostVerifyResetPasswordAttemptBody": {},
-      "PostVerifyResetPasswordAttemptResponseItem": {}
+      "PostVerifyResetPasswordAttemptResponseItem": {},
+      "GetSessionsResponseItem": {},
+      "GetSessionDetailsResponseItem": {},
+      "GetHandshakeSessionResponseItem": {},
+      "PostRefreshAccessTokenResponseItem": {},
+      "PostRevokeSessionResponseItem": {}
     },
     "responses": {
       "BadRequestErrorResponse": {

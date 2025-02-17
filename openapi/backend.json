@@ -38,7 +38,7 @@
     "/v1/identifiers": {
       "get": {
         "tags": ["Identifiers"],
-        "summary": "List identifiers",
+        "summary": "List Identifiers",
         "description": "Retrieve a paginated list of identifiers filtered by user ID",
         "operationId": "getIdentifiers",
         "parameters": [
@@ -127,7 +127,7 @@
       "post": {
         "tags": ["Identifiers"],
         "description": "Use this endpoint to create a new user identifer",
-        "summary": "Create a new user identifier",
+        "summary": "Create a New User Identifier",
         "operationId": "createIdentifier",
         "parameters": [
           {
@@ -188,7 +188,7 @@
       "delete": {
         "tags": ["Identifiers"],
         "description": "Delete an identifier from a user.",
-        "summary": "Delete an identifier",
+        "summary": "Delete an Identifier",
         "operationId": "deleteIdentifier",
         "parameters": [
           {
@@ -250,7 +250,7 @@
       "post": {
         "tags": ["Identifiers"],
         "description": "Set a password to a specific identifier data. Only works with [direct identifier](/docs/guides/direct/overview).",
-        "summary": "Set password to identifier",
+        "summary": "Set Password to an Identifier",
         "operationId": "setIdentifierPassword",
         "parameters": [
           {
@@ -321,7 +321,7 @@
     "/v1/sessions": {
       "get": {
         "tags": ["Sessions"],
-        "summary": "List sessions",
+        "summary": "List Sessions",
         "description": "Retrieve a paginated list of sessions filtered by user ID",
         "operationId": "getSessions",
         "parameters": [
@@ -410,7 +410,7 @@
       "post": {
         "tags": ["Sessions"],
         "description": "Use this endpoint to create a new session for a user/identifiers",
-        "summary": "Create new session",
+        "summary": "Create a New Session",
         "operationId": "postCreateSession",
         "parameters": [
           {
@@ -471,7 +471,7 @@
       "post": {
         "tags": ["Sessions"],
         "description": "Refresh access token for a specific session. Learn more about sessions refresh mechanism, [here](/docs/concepts/how-it-works/token-refresh).",
-        "summary": "Refresh access token",
+        "summary": "Refresh Access Token",
         "operationId": "postRefreshSessionToken",
         "parameters": [
           {
@@ -541,7 +541,7 @@
       "post": {
         "tags": ["Sessions"],
         "description": "Revoke a specific session. The session's `status` will be changed to `revoked` and session is not valid and cannot be refreshed and/or used anymore.",
-        "summary": "Revoke access token",
+        "summary": "Revoke a Session",
         "operationId": "postRevokeSession",
         "parameters": [
           {
@@ -610,7 +610,7 @@
     "/v1/users": {
       "get": {
         "tags": ["Users"],
-        "summary": "List users",
+        "summary": "List Users",
         "description": "Retrieve a paginated list of users in the current environment",
         "operationId": "getUsers",
         "parameters": [
@@ -706,7 +706,7 @@
       "post": {
         "tags": ["Users"],
         "description": "Use this endpoint to create a new user data (optionally along with its identifier).",
-        "summary": "Create a new user",
+        "summary": "Create a New User",
         "operationId": "postCreateUser",
         "parameters": [
           {
@@ -767,7 +767,7 @@
       "get": {
         "tags": ["Users"],
         "description": "Get a details of a user's data",
-        "summary": "Get user's details",
+        "summary": "Get User's Details",
         "operationId": "getUserDetail",
         "parameters": [
           {
@@ -828,7 +828,7 @@
       "delete": {
         "tags": ["Users"],
         "description": "Delete a user in an environment.",
-        "summary": "Delete a user",
+        "summary": "Delete a User",
         "operationId": "deleteUser",
         "parameters": [
           {
@@ -891,7 +891,7 @@
       "post": {
         "tags": ["Users"],
         "description": "Ban a user. By banning a user, all of the existing sessions will be revoked and user's cannot be issued a token or do any activities (eg. signing in, signing up, reset password, etc).",
-        "summary": "Ban a user",
+        "summary": "Ban a User",
         "operationId": "postBanUser",
         "parameters": [
           {
@@ -963,7 +963,7 @@
       "post": {
         "tags": ["Users"],
         "description": "Un-ban a user. By un-bannng a user, user's will be able to interact with your applications and can be issued a token and can do any activities (eg. signing in, signing up, reset password, etc).",
-        "summary": "Un-ban a user",
+        "summary": "Un-ban a User",
         "operationId": "postUnbanUser",
         "parameters": [
           {
