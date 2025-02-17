@@ -895,22 +895,444 @@
       }
     },
     "/v1/settings": {
-      "get": {}
+      "get": {
+        "tags": ["Settings"],
+        "summary": "Get Environment Settings",
+        "description": "Retrieve a detailed data for current environment settings/configurations.",
+        "operationId": "getSettings",
+        "security": [{ "NoAuth": [] }],
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-cakeauth-public-key",
+            "schema": {
+              "type": "string",
+              "format": "public_key",
+              "example": "pub_test_c3ViZG9tYWluLmV4YW1wbGUuY29t"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A detailed environment's settings data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/GetSettingsResponseItem"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
     },
     "/v1/signin/strategies": {
-      "post": {}
+      "post": {
+        "tags": ["Sign In"],
+        "description": "Get available signin strategies for a given [direct identifier](/docs/guides/direct/overview). This can be use for a system where multiple authentication strategies is used. If your environment only allows signin strategies, you don't need to call this API. You can directly [create a new signin attempt](#/tag/sign-in/POST/v1/signin/attempts).",
+        "summary": "Check Signin Strategies",
+        "operationId": "postGetAvailableSigninStrategies",
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-cakeauth-public-key",
+            "schema": {
+              "type": "string",
+              "format": "public_key",
+              "example": "pub_test_c3ViZG9tYWluLmV4YW1wbGUuY29t"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostGetAvailableSigninStrategiesBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sign in strategies returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/PostGetAvailableSigninStrategiesResponseItem"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
     },
     "/v1/signin/attempts": {
-      "post": {}
+      "post": {
+        "tags": ["Sign In"],
+        "description": "Create an attempt to signin/authenticate for existing user.",
+        "summary": "Create Signin Attempt",
+        "operationId": "postAttemptSignin",
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-cakeauth-public-key",
+            "schema": {
+              "type": "string",
+              "format": "public_key",
+              "example": "pub_test_c3ViZG9tYWluLmV4YW1wbGUuY29t"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostAttemptSigninBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sign in attempt created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/PostAttemptSigninResponseItem"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
     },
     "/v1/signin/attempts/{attempt_id}/verify": {
-      "post": {}
+      "post": {
+        "tags": ["Sign In"],
+        "description": "Verify a signin attempt with chosen authentication strategy.",
+        "summary": "Verify Signin Attempt",
+        "operationId": "postVerifySigninAttempt",
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "in": "path",
+            "name": "attempt_id",
+            "schema": {
+              "type": "string",
+              "format": "id",
+              "example": "atm_p2n21pe9filh8v5o98nja9j5zdtrkdfr"
+            },
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "x-cakeauth-public-key",
+            "schema": {
+              "type": "string",
+              "format": "public_key",
+              "example": "pub_test_c3ViZG9tYWluLmV4YW1wbGUuY29t"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostVerifySigninAttemptBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sign in attempt verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/PostVerifySigninAttemptResponseItem"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
     },
     "/v1/signup/attempts": {
-      "post": {}
+      "post": {
+        "tags": ["Sign Up"],
+        "description": "Create an attempt to signup/register for a new user. **Important**: If you set the [`verify_on_signup=false`](/docs/guides/direct/email#verify-on-signup) in your environment settings, this endpoint will automatically create a new user (see `is_user_created=true` flag). If it requires to verify on signup, an attempt will be created (see `is_user_created=false` flag).",
+        "summary": "Create Signup Attempt",
+        "operationId": "postAttemptSignup",
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-cakeauth-public-key",
+            "schema": {
+              "type": "string",
+              "format": "public_key",
+              "example": "pub_test_c3ViZG9tYWluLmV4YW1wbGUuY29t"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostAttemptSignupBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sign in attempt created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/PostAttemptSignupResponseItem"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
     },
     "/v1/signup/attempts/{attempt_id}/verify": {
-      "post": {}
+      "post": {
+        "tags": ["Sign Up"],
+        "description": "Verify a signup attempt with chosen authentication strategy.",
+        "summary": "Verify Signup Attempt",
+        "operationId": "postVerifySignupAttempt",
+        "parameters": [
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "example": "application/json"
+            }
+          },
+          {
+            "in": "path",
+            "name": "attempt_id",
+            "schema": {
+              "type": "string",
+              "format": "id",
+              "example": "atm_p2n21pe9filh8v5o98nja9j5zdtrkdfr"
+            },
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "x-cakeauth-public-key",
+            "schema": {
+              "type": "string",
+              "format": "public_key",
+              "example": "pub_test_c3ViZG9tYWluLmV4YW1wbGUuY29t"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostVerifySignupAttemptBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sign up succesfully verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiResponseWrapper" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/PostVerifySignupAttemptResponseItem"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequestErrorResponse" },
+          "401": { "$ref": "#/components/responses/UnauthorizedErrorResponse" },
+          "500": { "$ref": "#/components/responses/ErrorResponse" }
+        }
+      }
     }
   },
   "components": {
@@ -1230,7 +1652,16 @@
       "GetSessionDetailsResponseItem": {},
       "GetHandshakeSessionResponseItem": {},
       "PostRefreshAccessTokenResponseItem": {},
-      "PostRevokeSessionResponseItem": {}
+      "PostRevokeSessionResponseItem": {},
+      "GetSettingsResponseItem": {},
+      "PostGetAvailableSigninStrategiesBody": {},
+      "PostGetAvailableSigninStrategiesResponseItem": {},
+      "PostAttemptSigninBody": {},
+      "PostAttemptSigninResponseItem": {},
+      "PostVerifySigninAttemptBody": {},
+      "PostVerifySigninAttemptResponseItem": {},
+      "PostAttemptSignupBody": {},
+      "PostAttemptSignupResponseItem": {}
     },
     "responses": {
       "BadRequestErrorResponse": {
