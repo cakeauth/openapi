@@ -191,10 +191,7 @@
                       "type": "object",
                       "properties": {
                         "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/GetMeResponseItem"
-                          }
+                          "$ref": "#/components/schemas/GetMeResponseItem"
                         }
                       }
                     }
@@ -212,7 +209,7 @@
     "/v1/me/reset_password": {
       "post": {
         "tags": ["Me"],
-        "description": "Reset password for current authenticated users.",
+        "description": "Reset password for currently authenticated user's identifiers (`is_current=true`). If you want to **set** a password to a user which no password data previously available (`is_password_enabled=false`), use the [password reset flow](docs/guides/reset-password) instead.",
         "summary": "Reset Current User's Password",
         "operationId": "postMeResetPassword",
         "parameters": [
@@ -265,10 +262,7 @@
                       "type": "object",
                       "properties": {
                         "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/PostMeResetPasswordResponseItem"
-                          }
+                          "$ref": "#/components/schemas/PostMeResetPasswordResponseItem"
                         }
                       }
                     }
@@ -417,10 +411,7 @@
                       "type": "object",
                       "properties": {
                         "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/PostAttemptResetPasswordResponseItem"
-                          }
+                          "$ref": "#/components/schemas/PostAttemptResetPasswordResponseItem"
                         }
                       }
                     }
@@ -502,10 +493,7 @@
                       "type": "object",
                       "properties": {
                         "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/PostVerifyResetPasswordAttemptResponseItem"
-                          }
+                          "$ref": "#/components/schemas/PostVerifyResetPasswordAttemptResponseItem"
                         }
                       }
                     }
@@ -664,10 +652,7 @@
                       "type": "object",
                       "properties": {
                         "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/GetSessionDetailsResponseItem"
-                          }
+                          "$ref": "#/components/schemas/GetSessionDetailsResponseItem"
                         }
                       }
                     }
@@ -738,10 +723,7 @@
                       "type": "object",
                       "properties": {
                         "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/GetHandshakeSessionResponseItem"
-                          }
+                          "$ref": "#/components/schemas/GetHandshakeSessionResponseItem"
                         }
                       }
                     }
@@ -941,10 +923,7 @@
                       "type": "object",
                       "properties": {
                         "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/GetSettingsResponseItem"
-                          }
+                          "$ref": "#/components/schemas/GetSettingsResponseItem"
                         }
                       }
                     }
@@ -1443,6 +1422,14 @@
           }
         }
       },
+      "DirectIdentifierProviders": {
+        "type": "string",
+        "enum": ["email", "username", "phone"]
+      },
+      "DirectIdentifierMediums": {
+        "type": "string",
+        "enum": ["email", "sms", "whatsapp"]
+      },
       "SessionActivityLogItem": {
         "type": "object",
         "properties": {
@@ -1641,27 +1628,1172 @@
           }
         }
       },
-      "GetMeResponseItem": {},
-      "PostMeResetPasswordBody": {},
-      "PostMeResetPasswordResponseItem": {},
-      "PostAttemptResetPasswordBody": {},
-      "PostAttemptResetPasswordResponseItem": {},
-      "PostVerifyResetPasswordAttemptBody": {},
-      "PostVerifyResetPasswordAttemptResponseItem": {},
-      "GetSessionsResponseItem": {},
-      "GetSessionDetailsResponseItem": {},
-      "GetHandshakeSessionResponseItem": {},
-      "PostRefreshAccessTokenResponseItem": {},
-      "PostRevokeSessionResponseItem": {},
-      "GetSettingsResponseItem": {},
-      "PostGetAvailableSigninStrategiesBody": {},
-      "PostGetAvailableSigninStrategiesResponseItem": {},
-      "PostAttemptSigninBody": {},
-      "PostAttemptSigninResponseItem": {},
-      "PostVerifySigninAttemptBody": {},
-      "PostVerifySigninAttemptResponseItem": {},
-      "PostAttemptSignupBody": {},
-      "PostAttemptSignupResponseItem": {}
+      "GetMeResponseItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "external_id",
+          "status",
+          "identifiers",
+          "updated_at",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Random unique ID",
+            "format": "nanoid",
+            "example": "idn_a9d35175ea94b9367aa18237ca518d99"
+          },
+          "external_id": {
+            "type": "string",
+            "description": "Tenant's defined unique ID",
+            "format": "string",
+            "example": "0194f092-a25a-700d-a4f6-8b50e865fd00",
+            "minimum": 1,
+            "maximum": 64
+          },
+          "status": {
+            "description": "User status",
+            "$ref": "#/components/schemas/ClientUsersStatus"
+          },
+          "identifiers": {
+            "type": "array",
+            "description": "List of current user's identifiers",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Random unique ID",
+                  "format": "nanoid",
+                  "example": "idn_a9d35175ea94b9367aa18237ca518d99"
+                },
+                "provider": {
+                  "description": "Current identifier's provider",
+                  "$ref": "#/components/schemas/ClientUsersIdentifiersProvider"
+                },
+                "logo": {
+                  "type": "string",
+                  "format": "link",
+                  "description": "Link to provider logo",
+                  "example": "https://cdn.cakeauth.com/socials/apple.svg"
+                },
+                "value": {
+                  "type": "string",
+                  "description": "Identifier value (e.g., email or phone number)",
+                  "example": "test@example.com"
+                },
+                "is_current": {
+                  "type": "boolean",
+                  "description": "Whether this identifier is the currently active one (used in the current session data)"
+                },
+                "is_password_enabled": {
+                  "type": "boolean",
+                  "description": "Whether a password is enabled for this identifier"
+                },
+                "is_verified": {
+                  "type": "boolean",
+                  "description": "Whether this identifier has been verified"
+                },
+                "contact_informations": {
+                  "type": "array",
+                  "description": "List of associated contact information",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "Random unique ID for contact information",
+                        "example": "idn_a9d35175ea94b9367aa18237ca518d99"
+                      },
+                      "type": {
+                        "description": "Type of contact information",
+                        "$ref": "#/components/schemas/ClientUsersIdentifierContactInformationsType"
+                      },
+                      "value": {
+                        "type": "string",
+                        "description": "Contact information value (e.g., email address, phone number)",
+                        "example": "test@example.com"
+                      },
+                      "is_verified": {
+                        "type": "boolean",
+                        "description": "Whether the contact information has been verified"
+                      }
+                    },
+                    "required": ["id", "type", "value", "is_verified"]
+                  }
+                },
+                "updated_at": {
+                  "type": "integer",
+                  "description": "UNIX Timestamp of date last updated",
+                  "format": "int64",
+                  "example": 1739201710547
+                },
+                "created_at": {
+                  "type": "integer",
+                  "description": "UNIX Timestamp of date created",
+                  "format": "int64",
+                  "example": 1739201710547
+                }
+              },
+              "required": [
+                "id",
+                "provider",
+                "logo",
+                "value",
+                "is_current",
+                "is_password_enabled",
+                "is_verified",
+                "contact_informations",
+                "updated_at",
+                "created_at"
+              ]
+            }
+          },
+          "updated_at": {
+            "type": "integer",
+            "description": "UNIX Timestamp of date last updated",
+            "format": "unixtime",
+            "example": 1739201710547
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "UNIX Timestamp of date created",
+            "format": "unixtime",
+            "example": 1739201710547
+          }
+        }
+      },
+      "PostMeResetPasswordBody": {
+        "type": "object",
+        "required": [
+          "new_password",
+          "current_password",
+          "revoke_other_sessions"
+        ],
+        "properties": {
+          "current_password": {
+            "type": "string",
+            "minLength": 8,
+            "format": "password",
+            "description": "Currently existing password.",
+            "example": "my-secure-password"
+          },
+          "new_password": {
+            "type": "string",
+            "minLength": 8,
+            "format": "password",
+            "description": "New password that wants to be set",
+            "example": "my-secure-password"
+          },
+          "revoke_other_sessions": {
+            "type": "boolean",
+            "description": "This flags control whether to **revoke all other active sessions** for this user or not."
+          }
+        }
+      },
+      "PostMeResetPasswordResponseItem": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Success response message",
+            "example": "Password successfully updated"
+          }
+        }
+      },
+      "PostAttemptResetPasswordBody": {
+        "type": "object",
+        "required": ["target_url", "provider", "value"],
+        "properties": {
+          "captcha_token": {
+            "type": "string",
+            "format": "captcha_token",
+            "description": "Captcha token. Read more about bot protections, [here](/docs/guides/securing-app/bot-protection).",
+            "example": "<captcha-token>"
+          },
+          "target_url": {
+            "type": "string",
+            "format": "url",
+            "description": "A full path to password reset page. Read more about password reset link, [here](/docs/guides/reset-password#password-reset-link).",
+            "example": "https://example.com/pages/reset-password"
+          },
+          "provider": {
+            "description": "Target identifier's provider",
+            "$ref": "#/components/schemas/DirectIdentifierProviders"
+          },
+          "value": {
+            "type": "string",
+            "description": "Identifier value (e.g., value of email or phone number)",
+            "example": "test@example.com"
+          }
+        }
+      },
+      "PostAttemptResetPasswordResponseItem": {
+        "type": "object",
+        "required": ["attempt_id", "provider", "expires_at", "medium"],
+        "properties": {
+          "attempt_id": {
+            "description": "Random unique ID identifies the current attempt",
+            "format": "nanoid",
+            "example": "atm_a9d35175ea94b9367aa18237ca518d99"
+          },
+          "provider": {
+            "description": "Target identifier's provider",
+            "$ref": "#/components/schemas/DirectIdentifierProviders"
+          },
+          "expires_at": {
+            "type": "integer",
+            "description": "UNIX Timestamp of date the attempt expires",
+            "format": "int64",
+            "example": 1739201710547
+          },
+          "medium": {
+            "description": "Target identifier's provider",
+            "$ref": "#/components/schemas/DirectIdentifierMediums"
+          },
+          "masked_target": {
+            "type": "string",
+            "format": "string",
+            "description": "A masked address for the email/phone number values.",
+            "example": "t**@**e.com"
+          }
+        }
+      },
+      "PostVerifyResetPasswordAttemptBody": {
+        "type": "object",
+        "required": ["new_password", "token"],
+        "properties": {
+          "new_password": {
+            "type": "string",
+            "minLength": 8,
+            "format": "password",
+            "description": "New password that wants to be set",
+            "example": "my-secure-password"
+          },
+          "token": {
+            "type": "string",
+            "description": "Attempt token sent to the users. Signifies via the `__cakeauth_token` params. Read more about the structure of password reset link, [here](/docs/guides/reset-password#password-reset-link).",
+            "example": "tok_a9d35175ea94b9367aa18237ca518d99"
+          }
+        }
+      },
+      "PostVerifyResetPasswordAttemptResponseItem": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Success response message",
+            "example": "Password successfully resetted"
+          }
+        }
+      },
+      "GetSessionsResponseItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "user",
+          "status",
+          "identifiers",
+          "updated_at",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Random unique ID",
+            "format": "nanoid",
+            "example": "ses_a9d35175ea94b9367aa18237ca518d99"
+          },
+          "user": {
+            "type": "object",
+            "description": "User data of the current session",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Random unique ID",
+                "format": "nanoid",
+                "example": "idn_a9d35175ea94b9367aa18237ca518d99"
+              },
+              "external_id": {
+                "type": "string",
+                "description": "Tenant's defined unique ID",
+                "format": "string",
+                "example": "0194f092-a25a-700d-a4f6-8b50e865fd00",
+                "minimum": 1,
+                "maximum": 64
+              }
+            }
+          },
+          "status": {
+            "description": "Sesison status",
+            "$ref": "#/components/schemas/AccessClientUsersSessionsStatus"
+          },
+          "metadata": {
+            "description": "Session's metadata",
+            "$ref": "#/components/schemas/SessionActivityMetadata"
+          },
+          "identifiers": {
+            "type": "array",
+            "description": "List of identifiers of current user's identifiers",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Random unique ID",
+                  "format": "nanoid",
+                  "example": "idn_a9d35175ea94b9367aa18237ca518d99"
+                },
+                "provider": {
+                  "description": "Current identifier's provider",
+                  "$ref": "#/components/schemas/ClientUsersIdentifiersProvider"
+                },
+                "logo": {
+                  "type": "string",
+                  "format": "link",
+                  "description": "Link to provider logo",
+                  "example": "https://cdn.cakeauth.com/socials/apple.svg"
+                },
+                "value": {
+                  "type": "string",
+                  "description": "Identifier value (e.g., email or phone number)",
+                  "example": "test@example.com"
+                },
+                "is_current": {
+                  "type": "boolean",
+                  "description": "Whether this identifier is the currently active one (used in the current session data)"
+                },
+                "is_password_enabled": {
+                  "type": "boolean",
+                  "description": "Whether a password is enabled for this identifier"
+                },
+                "is_verified": {
+                  "type": "boolean",
+                  "description": "Whether this identifier has been verified"
+                },
+                "contact_informations": {
+                  "type": "array",
+                  "description": "List of associated contact information",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "Random unique ID for contact information",
+                        "example": "idn_a9d35175ea94b9367aa18237ca518d99"
+                      },
+                      "type": {
+                        "description": "Type of contact information",
+                        "$ref": "#/components/schemas/ClientUsersIdentifierContactInformationsType"
+                      },
+                      "value": {
+                        "type": "string",
+                        "description": "Contact information value (e.g., email address, phone number)",
+                        "example": "test@example.com"
+                      },
+                      "is_verified": {
+                        "type": "boolean",
+                        "description": "Whether the contact information has been verified"
+                      }
+                    },
+                    "required": ["id", "type", "value", "is_verified"]
+                  }
+                },
+                "updated_at": {
+                  "type": "integer",
+                  "description": "UNIX Timestamp of date last updated",
+                  "format": "int64",
+                  "example": 1739201710547
+                },
+                "created_at": {
+                  "type": "integer",
+                  "description": "UNIX Timestamp of date created",
+                  "format": "int64",
+                  "example": 1739201710547
+                }
+              },
+              "required": [
+                "id",
+                "provider",
+                "logo",
+                "value",
+                "is_current",
+                "is_password_enabled",
+                "is_verified",
+                "contact_informations",
+                "updated_at",
+                "created_at"
+              ]
+            }
+          },
+
+          "expires_at": {
+            "type": "integer",
+            "description": "UNIX Timestamp of date expired",
+            "format": "unixtime",
+            "example": 1739201710547
+          },
+          "revoked_at": {
+            "type": "integer",
+            "description": "UNIX Timestamp of date revoked",
+            "format": "unixtime",
+            "example": 1739201710547
+          },
+          "updated_at": {
+            "type": "integer",
+            "description": "UNIX Timestamp of date last updated",
+            "format": "unixtime",
+            "example": 1739201710547
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "UNIX Timestamp of date created",
+            "format": "unixtime",
+            "example": 1739201710547
+          }
+        }
+      },
+      "GetSessionDetailsResponseItem": {
+        "$ref": "#/components/schemas/GetSessionsResponseItem"
+      },
+      "GetHandshakeSessionResponseItem": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/GetSessionsResponseItem"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "token": {
+                "$ref": "#/components/schemas/CommonTokenResponseItem"
+              }
+            }
+          }
+        ]
+      },
+      "PostRefreshAccessTokenResponseItem": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/GetSessionsResponseItem"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "token": {
+                "$ref": "#/components/schemas/CommonTokenResponseItem"
+              }
+            }
+          }
+        ]
+      },
+      "PostRevokeSessionResponseItem": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Success response message",
+            "example": "Session successfully revoked"
+          }
+        }
+      },
+      "PostGetAvailableSigninStrategiesBody": {
+        "type": "object",
+        "required": ["provider", "value"],
+        "properties": {
+          "provider": {
+            "description": "Target identifier's provider to check",
+            "$ref": "#/components/schemas/DirectIdentifierProviders"
+          },
+          "value": {
+            "type": "string",
+            "description": "Identifier value to check (e.g., value of email or phone number)",
+            "example": "test@example.com"
+          }
+        }
+      },
+      "PostGetAvailableSigninStrategiesResponseItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "provider",
+          "method",
+          "strategy",
+          "title",
+          "subtitle"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifier ID. Supporting the `user_id` property.",
+            "example": "idn_a9d35175ea94b9367aa18237ca518d99"
+          },
+          "provider": {
+            "description": "Target identifier's provider",
+            "$ref": "#/components/schemas/SettingsTenantAuthenticationStrategiesProvider"
+          },
+          "method": {
+            "description": "Authentication strategies method",
+            "$ref": "#/components/schemas/SettingsTenantAuthenticationStrategiesMethod"
+          },
+          "strategy": {
+            "type": "string",
+            "description": "Strategy code. It's a combination of {provider}_{method}.",
+            "example": "phone_whatsapp_code"
+          },
+          "title": {
+            "type": "string",
+            "description": "Title of the authentication strategy. Useful to display in a client component.",
+            "example": "WhatsApp OTP"
+          },
+          "subtitle": {
+            "type": "string",
+            "description": "Subtitle/description of the authentication strategy. Useful to display in a client component.",
+            "example": "Get a one-time password sent to your phone via WhatsApp"
+          }
+        }
+      },
+      "PostAttemptSigninBody": {
+        "type": "object",
+        "required": ["authentication_strategy", "provider", "value"],
+        "properties": {
+          "captcha_token": {
+            "type": "string",
+            "format": "captcha_token",
+            "description": "Captcha token. Read more about bot protections, [here](/docs/guides/securing-app/bot-protection).",
+            "example": "<captcha-token>"
+          },
+          "authentication_strategy": {
+            "type": "string",
+            "format": "{provider}_{method}",
+            "description": "Desired authentication strategy provider & method.",
+            "example": "phone_whatsapp_code"
+          },
+          "provider": {
+            "description": "Target identifier's provider",
+            "$ref": "#/components/schemas/DirectIdentifierProviders"
+          },
+          "value": {
+            "type": "string",
+            "description": "Identifier value (e.g., value of email or phone number)",
+            "example": "test@example.com"
+          }
+        }
+      },
+      "PostAttemptSigninResponseItem": {
+        "type": "object",
+        "required": [
+          "attempt_id",
+          "authentication_strategy",
+          "expires_at",
+          "components"
+        ],
+        "properties": {
+          "attempt_id": {
+            "description": "Random unique ID identifies the current attempt",
+            "format": "nanoid",
+            "example": "atm_a9d35175ea94b9367aa18237ca518d99"
+          },
+          "masked_target": {
+            "type": "string",
+            "format": "string",
+            "description": "A masked address for the email/phone number values.",
+            "example": "t**@**e.com"
+          },
+          "authentication_strategy": {
+            "type": "string",
+            "format": "{provider}_{method}",
+            "description": "Desired authentication strategy provider & method.",
+            "example": "phone_whatsapp_code"
+          },
+          "expires_at": {
+            "type": "integer",
+            "description": "UNIX Timestamp of date the attempt expires",
+            "format": "int64",
+            "example": 1739201710547
+          },
+          "components": {
+            "type": "array",
+            "description": "A list of helpful arrays for you to decide what kind of components to render for current attempt.",
+            "items": {
+              "type": "object",
+              "required": ["type", "label", "component_kind", "required"],
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "Component type",
+                  "example": "code"
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Label of the strategy. Useful to display in a client component.",
+                  "example": "Code"
+                },
+                "component_kind": {
+                  "type": "string",
+                  "enum": ["button", "input"]
+                },
+                "logo": {
+                  "type": "string",
+                  "format": "link",
+                  "description": "Link to authentication strategy logo",
+                  "example": "https://cdn.cakeauth.com/socials/whtasapp.svg"
+                },
+                "required": {
+                  "type": "boolean",
+                  "description": "Whether the component is required to be fulfilled"
+                }
+              }
+            }
+          }
+        }
+      },
+      "PostVerifySigninAttemptBody": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "format": "code",
+            "description": "If authentciation method is `code`, pass the code value to check here. If not, ignore this params.",
+            "example": "123456"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "format": "password",
+            "description": "If authentciation method is `password`, pass the password value to check here. If not, ignore this params.",
+            "example": "my-secure-password"
+          }
+        }
+      },
+      "PostVerifySigninAttemptResponseItem": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/GetSessionsResponseItem"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "token": {
+                "$ref": "#/components/schemas/CommonTokenResponseItem"
+              }
+            }
+          }
+        ]
+      },
+      "PostAttemptSignupBody": {
+        "type": "object",
+        "required": ["veriication_strategy", "provider", "value"],
+        "properties": {
+          "captcha_token": {
+            "type": "string",
+            "format": "captcha_token",
+            "description": "Captcha token. Read more about bot protections, [here](/docs/guides/securing-app/bot-protection).",
+            "example": "<captcha-token>"
+          },
+          "veriication_strategy": {
+            "type": "string",
+            "format": "{provider}_{method}",
+            "description": "Desired verification strategy provider & method.",
+            "example": "phone_whatsapp_code"
+          },
+          "provider": {
+            "description": "Target identifier's provider",
+            "$ref": "#/components/schemas/DirectIdentifierProviders"
+          },
+          "value": {
+            "type": "string",
+            "description": "Identifier value (e.g., value of email or phone number)",
+            "example": "test@example.com"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "format": "password",
+            "description": "Assign password for this user. If this value is not empty, the `is_password_enabled` will result to `true`. And vice versa.",
+            "example": "my-secure-password"
+          },
+          "external_id": {
+            "type": "string",
+            "description": "Random ID that uniqely identified a user in an environment. Use this to identify a user ID to match with your systems ID. If empty, CakeAuth will use the `id` value.",
+            "example": "0194f092-a25a-700d-a4f6-8b50e865fd00",
+            "maxLength": 64
+          },
+          "contact_informations": {
+            "type": "array",
+            "description": "List of contact informations related to this user",
+            "items": {
+              "type": "object",
+              "required": ["type", "value"],
+              "properties": {
+                "type": {
+                  "description": "Contact information type",
+                  "$ref": "#/components/schemas/ClientUsersIdentifierContactInformationsType"
+                },
+                "value": {
+                  "type": "string",
+                  "description": "Value of given contact information",
+                  "example": "test@example.com"
+                }
+              }
+            }
+          }
+        }
+      },
+      "PostAttemptSignupResponseItem": {
+        "type": "object",
+        "required": ["is_user_created"],
+        "properties": {
+          "is_user_created": {
+            "type": "boolean",
+            "description": "Signifies whether the signup processs is already done or user needs to do some attempt verification. If an attempt requires to be verifier, the value `attempt` will provides the attempt details, and the value `session` will be `null`. And vice-versa."
+          },
+          "attempt": {
+            "$ref": "#/components/schemas/PostAttemptSigninResponseItem"
+          },
+          "session": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GetSessionsResponseItem"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "$ref": "#/components/schemas/CommonTokenResponseItem"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "PostVerifySignupAttemptBody": {
+        "type": "object",
+        "required": ["code"],
+        "properties": {
+          "code": {
+            "type": "string",
+            "format": "code",
+            "description": "Pass the code value to check here",
+            "example": "123456"
+          }
+        }
+      },
+      "PostVerifySignupAttemptResponseItem": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/GetSessionsResponseItem"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "token": {
+                "$ref": "#/components/schemas/CommonTokenResponseItem"
+              }
+            }
+          }
+        ]
+      },
+      "GetSettingsResponseItem": {
+        "type": "object",
+        "properties": {
+          "project": {
+            "type": "object",
+            "required": ["id", "name"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Random unique ID for current project",
+                "format": "nanoid",
+                "example": "prj_a9d35175ea94b9367aa18237ca518d99"
+              },
+              "name": {
+                "type": "string",
+                "description": "Current project name",
+                "example": "My Cool Project"
+              }
+            }
+          },
+          "environment": {
+            "type": "object",
+            "required": ["id", "host", "name", "is_production"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Random unique ID for current environment",
+                "format": "nanoid",
+                "example": "env_a9d35175ea94b9367aa18237ca518d99"
+              },
+              "host": {
+                "type": "string",
+                "description": "Dedicated host for current environment",
+                "format": "url",
+                "example": "my-cool-app.test.cakeauth.cpp"
+              },
+              "name": {
+                "type": "string",
+                "description": "Current project name",
+                "example": "Development"
+              },
+              "is_production": {
+                "type": "boolean",
+                "description": "Signifies whether current environment is a [Development or Production environment](/docs/concepts/structure#3-environments)."
+              },
+              "configuration": {
+                "description": "Environment general configuration",
+                "required": [
+                  "support_link",
+                  "allow_signup",
+                  "session_lifetime",
+                  "disable_email_sub_address",
+                  "email_deny_list",
+                  "email_allow_list",
+                  "phone_deny_list",
+                  "phone_allow_list"
+                ],
+                "properties": {
+                  "support_link": {
+                    "type": "string",
+                    "description": "Where your users can reach out to you in case of problem",
+                    "default": "mailto:<your_email>",
+                    "example": "https://example.com/support"
+                  },
+                  "allow_signup": {
+                    "type": "boolean",
+                    "description": "[Signup restrictions](/docs/guides/securing-app/access-control#signup-restrictions)."
+                  },
+                  "session_lifetime": {
+                    "type": "object",
+                    "required": ["value", "unit"],
+                    "properties": {
+                      "value": {
+                        "type": "integer",
+                        "description": "[Max age](/docs/guides/customize/session#session-maximum-age).",
+                        "example": 1
+                      },
+                      "unit": {
+                        "$ref": "#/components/schemas/SettingsTenantEnvironmentsTimeUnit"
+                      }
+                    }
+                  },
+                  "inactivity_timeout": {
+                    "type": "object",
+                    "required": ["value", "unit"],
+                    "properties": {
+                      "value": {
+                        "type": "integer",
+                        "description": "[Inactivity timeout](/docs/guides/customize/session#inactivity-timeout-optional).",
+                        "example": 1
+                      },
+                      "unit": {
+                        "$ref": "#/components/schemas/SettingsTenantEnvironmentsTimeUnit"
+                      }
+                    }
+                  },
+                  "attempt_limit": {
+                    "type": "integer",
+                    "description": "Limit for [Auto-blocking](docs/guides/securing-app/auto-block).",
+                    "example": 99
+                  },
+                  "lockout": {
+                    "type": "object",
+                    "properties": {
+                      "value": {
+                        "type": "integer",
+                        "description": "Lockout/block duration for [Auto-blocking](docs/guides/securing-app/auto-block).",
+                        "example": 99
+                      },
+                      "unit": {
+                        "$ref": "#/components/schemas/SettingsTenantEnvironmentsTimeUnit"
+                      }
+                    },
+                    "required": ["value", "unit"]
+                  },
+                  "captcha": {
+                    "type": "object",
+                    "description": "Configurations for [Bot protection](/docs/guides/securing-app/bot-protection).",
+                    "required": ["site_key", "type"],
+                    "properties": {
+                      "site_key": {
+                        "type": "string",
+                        "description": "Publishable key from the captcha providers."
+                      },
+                      "type": {
+                        "$ref": "#/components/schemas/SettingsTenantEnvironmentsCaptchaType"
+                      }
+                    }
+                  },
+                  "disable_email_sub_address": {
+                    "type": "boolean",
+                    "description": "Disable email sub-address. Learn more, [here](/docs/guides/securing-app/access-control#email-restrictions)."
+                  },
+                  "email_deny_list": {
+                    "type": "array",
+                    "description": "Email deny list. **Important**: this feature is unavailable!",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "email_allow_list": {
+                    "type": "array",
+                    "description": "Email allow list. **Important**: this feature is unavailable!",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "phone_deny_list": {
+                    "type": "array",
+                    "description": "Phone deny list. **Important**: this feature is unavailable!",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "phone_allow_list": {
+                    "type": "array",
+                    "description": "Phone allow list. **Important**: this feature is unavailable!",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "description": "Random unique ID",
+                  "format": "nanoid",
+                  "example": "dom_a9d35175ea94b9367aa18237ca518d99"
+                },
+                "domain": {
+                  "description": "Authorized domain name. In `origin` format (eg. `https://example.com`.",
+                  "format": "url",
+                  "example": "https://example.com"
+                }
+              }
+            }
+          },
+          "signup_forms": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "provider": {
+                  "$ref": "#/components/schemas/SettingsTenantIdentifiersProvider"
+                },
+                "group": {
+                  "type": "string",
+                  "description": "Group of authentciation strategy.",
+                  "enum": ["social", "direct"]
+                },
+                "verification_strategies": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "description": "Random unique ID",
+                        "format": "nanoid",
+                        "example": "dom_a9d35175ea94b9367aa18237ca518d99"
+                      },
+                      "provider": {
+                        "$ref": "#/components/schemas/SettingsTenantAuthenticationStrategiesProvider"
+                      },
+                      "method": {
+                        "$ref": "#/components/schemas/SettingsTenantAuthenticationStrategiesMethod"
+                      },
+                      "strategy": {
+                        "type": "string",
+                        "format": "{provider}_{method}",
+                        "description": "Desired authentication strategy provider & method.",
+                        "example": "phone_whatsapp_code"
+                      },
+                      "title": {
+                        "type": "string",
+                        "description": "Title of the authentication strategy. Useful to display in a client component.",
+                        "example": "WhatsApp OTP"
+                      },
+                      "subtitle": {
+                        "type": "string",
+                        "description": "Subtitle/description of the authentication strategy. Useful to display in a client component.",
+                        "example": "Get a one-time password sent to your phone via WhatsApp"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "provider",
+                      "method",
+                      "strategy",
+                      "title",
+                      "subtitle"
+                    ]
+                  }
+                },
+                "components": {
+                  "type": "array",
+                  "description": "A list of helpful arrays for you to decide what kind of components to render for current attempt.",
+                  "required": [
+                    "provider",
+                    "group",
+                    "verification_strategies",
+                    "components"
+                  ],
+                  "items": {
+                    "type": "object",
+                    "required": ["type", "label", "component_kind", "required"],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "Component type",
+                        "example": "code"
+                      },
+                      "label": {
+                        "type": "string",
+                        "description": "Label of the strategy. Useful to display in a client component.",
+                        "example": "Code"
+                      },
+                      "component_kind": {
+                        "type": "string",
+                        "enum": ["button", "input"]
+                      },
+                      "logo": {
+                        "type": "string",
+                        "format": "link",
+                        "description": "Link to authentication strategy logo",
+                        "example": "https://cdn.cakeauth.com/socials/whtasapp.svg"
+                      },
+                      "required": {
+                        "type": "boolean",
+                        "description": "Whether the component is required to be fulfilled"
+                      },
+                      "configuration": {
+                        "type": "object",
+                        "description": "Configuratino for the authentication strategies. Only available for [Socials Identifier](/docs/guides/oauth/overview).",
+                        "properties": {
+                          "client_id": {
+                            "type": "string",
+                            "description": "OAuth client ID",
+                            "example": "xxx.googleusersapp.com"
+                          },
+                          "redirect_uri": {
+                            "type": "string",
+                            "description": "OAuth redirect uri",
+                            "example": "https://my-cool-app.live.cakeauth.app/v1/oauth/callback"
+                          },
+                          "scopes": {
+                            "type": "array",
+                            "description": "Array of scopes",
+                            "items": {
+                              "type": "string"
+                            },
+                            "example": ["read", "write"]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "signin_forms": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "provider": {
+                  "$ref": "#/components/schemas/SettingsTenantIdentifiersProvider"
+                },
+                "group": {
+                  "type": "string",
+                  "description": "Group of authentciation strategy.",
+                  "enum": ["social", "direct"]
+                },
+                "components": {
+                  "type": "array",
+                  "description": "A list of helpful arrays for you to decide what kind of components to render for current attempt.",
+                  "required": [
+                    "provider",
+                    "group",
+                    "verification_strategies",
+                    "components"
+                  ],
+                  "items": {
+                    "type": "object",
+                    "required": ["type", "label", "component_kind", "required"],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "description": "Component type",
+                        "example": "code"
+                      },
+                      "label": {
+                        "type": "string",
+                        "description": "Label of the strategy. Useful to display in a client component.",
+                        "example": "Code"
+                      },
+                      "component_kind": {
+                        "type": "string",
+                        "enum": ["button", "input"]
+                      },
+                      "logo": {
+                        "type": "string",
+                        "format": "link",
+                        "description": "Link to authentication strategy logo",
+                        "example": "https://cdn.cakeauth.com/socials/whtasapp.svg"
+                      },
+                      "required": {
+                        "type": "boolean",
+                        "description": "Whether the component is required to be fulfilled"
+                      },
+                      "configuration": {
+                        "type": "object",
+                        "description": "Configuratino for the authentication strategies. Only available for [Socials Identifier](/docs/guides/oauth/overview).",
+                        "properties": {
+                          "client_id": {
+                            "type": "string",
+                            "description": "OAuth client ID",
+                            "example": "xxx.googleusersapp.com"
+                          },
+                          "redirect_uri": {
+                            "type": "string",
+                            "description": "OAuth redirect uri",
+                            "example": "https://my-cool-app.live.cakeauth.app/v1/oauth/callback"
+                          },
+                          "scopes": {
+                            "type": "array",
+                            "description": "Array of scopes",
+                            "items": {
+                              "type": "string"
+                            },
+                            "example": ["read", "write"]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "project",
+          "environment",
+          "domains",
+          "signup_forms",
+          "signin_forms"
+        ]
+      }
     },
     "responses": {
       "BadRequestErrorResponse": {
